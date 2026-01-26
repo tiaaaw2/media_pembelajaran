@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import {
   View,
@@ -6,19 +7,26 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 
-const Login = () => {
+const Regis = () => {
   const navigation = useNavigation();
   return (
     <View style={styles.container}>
       {/* Judul */}
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Register</Text>
+
+      {/* Input Nama */}
+      <TextInput
+        placeholder="Nama Lengkap"
+        placeholderTextColor="#999"
+        style={styles.input}
+      />
 
       {/* Input Email */}
       <TextInput
         placeholder="Email"
         placeholderTextColor="#999"
+        keyboardType="email-address"
         style={styles.input}
       />
 
@@ -30,24 +38,32 @@ const Login = () => {
         style={styles.input}
       />
 
-      {/* Tombol Login */}
+      {/* Input Konfirmasi Password */}
+      <TextInput
+        placeholder="Konfirmasi Password"
+        placeholderTextColor="#999"
+        secureTextEntry
+        style={styles.input}
+      />
+
+      {/* Tombol Register */}
       <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Masuk</Text>
+        <Text style={styles.buttonText}>Daftar</Text>
       </TouchableOpacity>
 
-      {/* Register */}
-      <View style={styles.registerContainer}>
-        <Text style={styles.registerText}>Belum punya akun?</Text>
+      {/* Link Login */}
+      <View style={styles.loginContainer}>
+        <Text style={styles.loginText}>sudah punya akun?</Text>
 
-        <TouchableOpacity onPress={() => navigation.navigate('Regis')}>
-          <Text style={styles.registerLink}> Daftar</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.loginLink}> Login</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
 
-export default Login;
+export default Regis;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -60,7 +76,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#EFBC5D',
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: 30,
   },
   input: {
     borderWidth: 1,
@@ -69,7 +85,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    marginBottom: 16,
+    marginBottom: 14,
     color: '#000',
   },
   button: {
@@ -84,18 +100,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
-  registerContainer: {
+  loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 25,
   },
 
-  registerText: {
+  loginText: {
     color: '#555',
   },
 
-  registerLink: {
+  loginLink: {
     color: '#EFBC5D',
     fontWeight: 'bold',
   },

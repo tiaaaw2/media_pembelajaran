@@ -3,6 +3,7 @@ import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Login from './src/Login';
+import Regis from './src/Regis';
 
 const Stack = createNativeStackNavigator();
 function RootStack() {
@@ -10,6 +11,7 @@ function RootStack() {
     // pindah pindah tab
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Regis" component={Regis} />
     </Stack.Navigator>
   );
 }
