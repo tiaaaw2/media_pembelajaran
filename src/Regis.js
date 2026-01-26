@@ -47,7 +47,10 @@ const Regis = () => {
       />
 
       {/* Tombol Register */}
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Login')}
+        style={styles.button}
+      >
         <Text style={styles.buttonText}>Daftar</Text>
       </TouchableOpacity>
 
@@ -74,22 +77,19 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#EFBC5D',
+    color: '#4A6CF7',
     textAlign: 'center',
     marginBottom: 30,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#DDD',
     borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    marginBottom: 14,
-    color: '#000',
+    padding: 17,
+    backgroundColor: '#F2F4F8',
+    borderRadius: 15,
+    marginBottom: 16,
   },
   button: {
-    backgroundColor: '#EFBC5D',
+    backgroundColor: '#4A6CF7',
     paddingVertical: 14,
     borderRadius: 10,
     marginTop: 10,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   },
 
   loginLink: {
-    color: '#EFBC5D',
+    color: '#4A6CF7',
     fontWeight: 'bold',
   },
 });
