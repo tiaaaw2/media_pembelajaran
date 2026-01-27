@@ -7,6 +7,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { BookOpen, ChevronRight } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const dataMateri = [
   { id: 1, title: 'Aljabar', subtitle: 'Konsep dasar dan operasi aljabar' },
@@ -28,12 +29,17 @@ const dataMateri = [
 ];
 
 const Home = () => {
+  const navigation = useNavigation();
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.header}>Materi</Text>
 
       {dataMateri.map(item => (
-        <TouchableOpacity key={item.id} style={styles.card}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('MateriDetail')}
+          key={item.id}
+          style={styles.card}
+        >
           {/* Icon kiri */}
           <View style={styles.iconBox}>
             <BookOpen size={22} color="#4A6CF7" />

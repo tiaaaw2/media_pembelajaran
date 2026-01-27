@@ -7,6 +7,7 @@ import Login from './src/Login';
 import Regis from './src/Regis';
 import Home from './src/Home';
 import Profil from './src/Profil';
+import MateriDetail from './src/MateriDetail';
 
 const Tab = createBottomTabNavigator();
 function MyTabs() {
@@ -66,6 +67,7 @@ function RootStack() {
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Regis" component={Regis} />
       <Stack.Screen name="Home" component={MyTabs} />
+      <Stack.Screen name="MateriDetail" component={MateriDetail} />
     </Stack.Navigator>
   );
 }
