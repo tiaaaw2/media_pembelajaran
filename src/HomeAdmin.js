@@ -13,6 +13,7 @@ import {
   List,
   LogOut,
   ChevronRight,
+  Calculator,
 } from 'lucide-react-native';
 
 import { useNavigation } from '@react-navigation/native';
@@ -36,6 +37,14 @@ const dataAdmin = [
 
   {
     id: 3,
+    title: 'OHI-S',
+    subtitle: 'Perhitungan OHI-S',
+    screen: 'OHIS',
+    icon: Calculator,
+  },
+
+  {
+    id: 4,
     title: 'Logout',
     subtitle: 'Keluar dari akun admin',
     screen: 'Login',

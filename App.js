@@ -12,6 +12,7 @@ import EditDetails from './src/EditDetails';
 import Materi from './src/Materi';
 import ListMateri from './src/ListMateri';
 import HomeAdmin from './src/HomeAdmin';
+import OHIS from './src/OHIS';
 
 const Tab = createBottomTabNavigator();
 function MyTabs() {
@@ -77,6 +78,7 @@ function RootStack() {
       <Stack.Screen name="Materi" component={Materi} />
       <Stack.Screen name="Profil" component={Profil} />
       <Stack.Screen name="HomeAdmin" component={HomeAdmin} />
+      <Stack.Screen name="OHIS" component={OHIS} />
     </Stack.Navigator>
   );
 }

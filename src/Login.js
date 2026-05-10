@@ -12,63 +12,59 @@ import { useNavigation } from '@react-navigation/native';
 import db from '../database';
 
 const Login = () => {
-
   const navigation = useNavigation();
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // FUNCTION LOGIN
   const handleLogin = () => {
+    if (!username || !password) {
+      Alert.alert('Warning', 'Username dan password wajib diisi');
+      return;
+    }
+
+    setLoading(true);
 
     db.transaction(tx => {
-
       tx.executeSql(
         'SELECT * FROM pengguna WHERE username=? AND password=?',
         [username, password],
-
         (txObj, resultSet) => {
+          setLoading(false);
 
-          // JIKA USER DITEMUKAN
-          if (resultSet.rows.length > 0) {
+          try {
+            if (resultSet.rows.length > 0) {
+              const user = resultSet.rows.item(0);
 
-            const user = resultSet.rows.item(0);
-
-            // CEK ROLE
-            if (user.role === 'admin') {
-
-              navigation.replace('HomeAdmin');
-
+              // redirect sesuai role
+              if (user.role === 'admin') {
+                navigation.replace('HomeAdmin', { user });
+              } else {
+                navigation.replace('Home', { user });
+              }
             } else {
-
-              navigation.replace('Home');
-
+              Alert.alert('Login gagal', 'Username atau password salah');
             }
-
-          } else {
-
-            Alert.alert(
-              'Login Gagal',
-              'Username atau password salah'
-            );
-
+          } catch (error) {
+            console.log('Parse Error:', error);
+            Alert.alert('Error', 'Terjadi kesalahan saat login');
           }
-
         },
-
         (txObj, error) => {
-  console.log(JSON.stringify(error));
-}
+          setLoading(false);
+          console.log('DB Error:', error);
+          Alert.alert('Error', 'Terjadi kesalahan database');
+        }
       );
-
     });
-
   };
 
   return (
     <View style={styles.container}>
 
-      {/* Judul */}
+      {/* Title */}
       <Text style={styles.title}>Login</Text>
 
       {/* Username */}
@@ -78,6 +74,7 @@ const Login = () => {
         style={styles.input}
         value={username}
         onChangeText={setUsername}
+        autoCapitalize="none"
       />
 
       {/* Password */}
@@ -90,29 +87,24 @@ const Login = () => {
         onChangeText={setPassword}
       />
 
-      {/* Tombol Login */}
+      {/* Button Login */}
       <TouchableOpacity
         onPress={handleLogin}
         style={styles.button}
+        disabled={loading}
       >
-        <Text style={styles.buttonText}>Masuk</Text>
+        <Text style={styles.buttonText}>
+          {loading ? 'Loading...' : 'Masuk'}
+        </Text>
       </TouchableOpacity>
 
       {/* Register */}
       <View style={styles.registerContainer}>
+        <Text style={styles.registerText}>Belum punya akun?</Text>
 
-        <Text style={styles.registerText}>
-          Belum punya akun?
-        </Text>
-
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Regis')}
-        >
-          <Text style={styles.registerLink}>
-            {' '}Daftar
-          </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Regis')}>
+          <Text style={styles.registerLink}> Daftar</Text>
         </TouchableOpacity>
-
       </View>
 
     </View>
