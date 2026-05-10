@@ -8,6 +8,10 @@ import Regis from './src/Regis';
 import Home from './src/Home';
 import Profil from './src/Profil';
 import MateriDetail from './src/MateriDetail';
+import EditDetails from './src/EditDetails';
+import Materi from './src/Materi';
+import ListMateri from './src/ListMateri';
+import HomeAdmin from './src/HomeAdmin';
 
 const Tab = createBottomTabNavigator();
 function MyTabs() {
@@ -68,6 +72,11 @@ function RootStack() {
       <Stack.Screen name="Regis" component={Regis} />
       <Stack.Screen name="Home" component={MyTabs} />
       <Stack.Screen name="MateriDetail" component={MateriDetail} />
+      <Stack.Screen name="EditDetails" component={EditDetails} />
+      <Stack.Screen name="ListMateri" component={ListMateri} />
+      <Stack.Screen name="Materi" component={Materi} />
+      <Stack.Screen name="Profil" component={Profil} />
+      <Stack.Screen name="HomeAdmin" component={HomeAdmin} />
     </Stack.Navigator>
   );
 }
