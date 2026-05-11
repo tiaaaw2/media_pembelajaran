@@ -1,56 +1,62 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+} from 'react-native';
+
 import { useNavigation } from '@react-navigation/native';
 import db from '../database';
-import CustomModal from './components/CustomModal'; // pastikan path sesuai
+
 
 const Login = () => {
   const navigation = useNavigation();
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // state modal
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalTitle, setModalTitle] = useState('');
-  const [modalMessage, setModalMessage] = useState('');
-  const [modalType, setModalType] = useState('success'); // success, error, warning
-  const [modalClose, setModalClose] = useState(() => () => setModalVisible(false));
-
+  // FUNCTION LOGIN
   const handleLogin = () => {
     if (!username || !password) {
-      setModalTitle('Peringatan');
-      setModalMessage('Username dan password wajib diisi');
-      setModalType('warning');
-      setModalVisible(true);
+      Alert.alert('Warning', 'Username dan password wajib diisi');
       return;
     }
 
+    setLoading(true);
+
     db.transaction(tx => {
       tx.executeSql(
-        'SELECT * FROM users WHERE username = ? AND password = ?',
+        'SELECT * FROM pengguna WHERE username=? AND password=?',
         [username, password],
-        (_, result) => {
-          if (result.rows.length > 0) {
-            const user = result.rows.item(0);
+        (txObj, resultSet) => {
+          setLoading(false);
 
-            setModalTitle('Login Berhasil');
-            setModalMessage(`Selamat datang ${user.nama}`);
-            setModalType('success');
-            setModalVisible(true);
+          try {
+            if (resultSet.rows.length > 0) {
+              const user = resultSet.rows.item(0);
 
-            const onCloseModal = () => {
-              setModalVisible(false);
-              if (user.role === 'admin') navigation.replace('AdminTabs');
-              else navigation.replace('UserTabs');
-            };
-
-            setModalClose(() => onCloseModal);
-          } else {
-            setModalTitle('Error');
-            setModalMessage('Username atau password salah');
-            setModalType('error');
-            setModalVisible(true);
+              // redirect sesuai role
+              if (user.role === 'admin') {
+                navigation.replace('HomeAdmin', { user });
+              } else {
+                navigation.replace('Home', { user });
+              }
+            } else {
+              Alert.alert('Login gagal', 'Username atau password salah');
+            }
+          } catch (error) {
+            console.log('Parse Error:', error);
+            Alert.alert('Error', 'Terjadi kesalahan saat login');
           }
+        },
+        (txObj, error) => {
+          setLoading(false);
+          console.log('DB Error:', error);
+          Alert.alert('Error', 'Terjadi kesalahan database');
         }
       );
     });
@@ -58,16 +64,23 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
+
+      {/* Title */}
       <Text style={styles.title}>Login</Text>
 
+      {/* Username */}
       <TextInput
         placeholder="Username"
         placeholderTextColor="#999"
         value={username}
         onChangeText={setUsername}
         style={styles.input}
+        value={username}
+        onChangeText={setUsername}
+        autoCapitalize="none"
       />
 
+      {/* Password */}
       <TextInput
         placeholder="Password"
         placeholderTextColor="#999"
@@ -75,10 +88,19 @@ const Login = () => {
         value={password}
         onChangeText={setPassword}
         style={styles.input}
+        value={password}
+        onChangeText={setPassword}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Masuk</Text>
+      {/* Button Login */}
+      <TouchableOpacity
+        onPress={handleLogin}
+        style={styles.button}
+        disabled={loading}
+      >
+        <Text style={styles.buttonText}>
+          {loading ? 'Loading...' : 'Masuk'}
+        </Text>
       </TouchableOpacity>
 
       <View style={styles.registerContainer}>
@@ -88,14 +110,6 @@ const Login = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Modal */}
-      <CustomModal
-        visible={modalVisible}
-        onClose={modalClose}
-        title={modalTitle}
-        message={modalMessage}
-        type={modalType}
-      />
     </View>
   );
 };
@@ -107,8 +121,21 @@ const styles = StyleSheet.create({
   title: { fontSize: 32, fontWeight: '700', textAlign: 'center', marginBottom: 50, color: '#4A6CF7' },
   input: {
     backgroundColor: '#FFF',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#4A6CF7',
+    textAlign: 'center',
+    marginBottom: 40,
+  },
+
+  input: {
+    padding: 17,
+    backgroundColor: '#F2F4F8',
     borderRadius: 15,
     marginBottom: 20,
     borderWidth: 1,
@@ -120,11 +147,23 @@ const styles = StyleSheet.create({
     elevation: 2,
     fontSize: 16,
   },
+
   button: {
     backgroundColor: '#4A6CF7',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
+    paddingVertical: 14,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+
+  buttonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+
+  registerContainer: {
+    flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 10,
     shadowColor: '#4A6CF7',

@@ -13,11 +13,6 @@ import Home from './src/Home';
 import HomeAdmin from './src/HomeAdmin';
 import Profil from './src/Profil';
 import MateriDetail from './src/MateriDetail';
-import OHIS from './src/ohis';
-
-// Database
-import { createTables } from './database';
-import TambahMateri from './src/TambahMateri';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -119,7 +114,6 @@ function RootStack() {
       <Stack.Screen name="UserTabs" component={UserTabs} />
       <Stack.Screen name="AdminTabs" component={AdminTabs} />
       <Stack.Screen name="MateriDetail" component={MateriDetail} />
-      <Stack.Screen name="TambahMateri" component={TambahMateri} />
     </Stack.Navigator>
   );
 }

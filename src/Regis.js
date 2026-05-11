@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -11,57 +11,8 @@ import {
 import db from '../database'; // SESUAIKAN PATH DB KAMU
 
 const Regis = () => {
+
   const navigation = useNavigation();
-
-  const [nama, setNama] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [konfirmasiPassword, setKonfirmasiPassword] = useState('');
-
-  const handleRegister = () => {
-    if (!nama || !username || !password || !konfirmasiPassword) {
-      Alert.alert('Peringatan', 'Semua field wajib diisi');
-      return;
-    }
-
-    if (password !== konfirmasiPassword) {
-      Alert.alert('Error', 'Password tidak sama');
-      return;
-    }
-
-    db.transaction(tx => {
-      // Cek username sudah ada atau belum
-      tx.executeSql(
-        'SELECT * FROM users WHERE username = ?',
-        [username],
-        (_, result) => {
-          if (result.rows.length > 0) {
-            Alert.alert('Error', 'Username sudah digunakan');
-          } else {
-            // Insert user baru
-            tx.executeSql(
-              `INSERT INTO users (username, password, role, nama, foto)
-               VALUES (?, ?, ?, ?, ?)`,
-              [username, password, 'user', nama, null],
-              () => {
-                Alert.alert('Sukses', 'Registrasi berhasil', [
-                  {
-                    text: 'OK',
-                    onPress: () => navigation.replace('Login'),
-                  },
-                ]);
-              },
-              error => {
-                console.log(error);
-                Alert.alert('Error', 'Registrasi gagal');
-              },
-            );
-          }
-        },
-      );
-    });
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
@@ -74,7 +25,10 @@ const Regis = () => {
       />
 
       <TextInput
-        placeholder="Username"
+        placeholder="Email"
+        placeholderTextColor="#999"
+        keyboardType="email-address"
+        style={styles.input}
         value={username}
         onChangeText={setUsername}
         style={styles.input}
