@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,69 +8,84 @@ import {
 } from 'react-native';
 import { BookOpen, ChevronRight } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
-
-const dataMateri = [
-  { id: 1, title: 'Aljabar', subtitle: 'Konsep dasar dan operasi aljabar' },
-  {
-    id: 2,
-    title: 'Matematika Komputer',
-    subtitle: 'Logika, algoritma, dan perhitungan',
-  },
-  {
-    id: 3,
-    title: 'Bahasa Indonesia',
-    subtitle: 'Tata bahasa dan keterampilan menulis',
-  },
-  {
-    id: 4,
-    title: 'Bahasa Inggris',
-    subtitle: 'Grammar, vocabulary, dan conversation',
-  },
-];
+import db from '../database';
 
 const Home = () => {
+  const [materi, setMateri] = useState([]);
   const navigation = useNavigation();
+
+  // Ambil data saat komponen mount
+  useEffect(() => {
+    getMateri();
+  }, []);
+
+  function getMateri() {
+    db.transaction(tx => {
+      tx.executeSql(
+        'SELECT * FROM materi',
+        [],
+        (_, results) => {
+          const rows = results.rows.raw();
+          if (rows.length === 0) {
+            setMateri([]);
+            console.log('No materi found');
+          } else {
+            setMateri(rows);
+            console.log('Materi loaded:', rows);
+          }
+        },
+        error => {
+          setMateri([]);
+          console.log('Error retrieving materi: ', error);
+        },
+      );
+    });
+  }
+
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.header}>Materi</Text>
 
-      {dataMateri.map(item => (
-        <TouchableOpacity
-          onPress={() => navigation.navigate('MateriDetail')}
-          key={item.id}
-          style={styles.card}
-        >
-          {/* Icon kiri */}
-          <View style={styles.iconBox}>
-            <BookOpen size={22} color="#4A6CF7" />
-          </View>
+      <ScrollView>
+        {materi.map(item => (
+          <TouchableOpacity
+            key={item.id}
+            style={styles.card}
+            onPress={
+              () => navigation.navigate('MateriDetail', { item }) // kirim data ke detail
+            }
+          >
+            {/* Icon kiri */}
+            <View style={styles.iconBox}>
+              <BookOpen size={22} color="#4A6CF7" />
+            </View>
 
-          {/* Text */}
-          <View style={styles.textContainer}>
-            <Text style={styles.title}>{item.title}</Text>
-            <Text style={styles.subtitle}>{item.subtitle}</Text>
-          </View>
+            {/* Text */}
+            <View style={styles.textContainer}>
+              <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.subtitle}>{item.subtitle}</Text>
+            </View>
 
-          {/* Arrow kanan */}
-          <ChevronRight size={22} color="#4A6CF7" />
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
+            {/* Arrow kanan */}
+            <ChevronRight size={22} color="#4A6CF7" />
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
   );
 };
 
-export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5F7FB',
-    padding: 30,
+    padding: 20,
   },
   header: {
     fontSize: 22,
     fontWeight: '600',
     textAlign: 'center',
-    marginBottom: 50,
+    marginBottom: 20,
     marginTop: 10,
     color: '#1F2937',
   },
@@ -107,3 +122,5 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 });
+
+export default Home;

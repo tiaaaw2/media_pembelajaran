@@ -10,22 +10,18 @@ import {
 } from 'react-native';
 import { ArrowLeft, FileText, Upload, Trash2 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
+import db from '../database';
 
-const MateriDetail = ({ route }) => {
+const TambahMateri = () => {
   const navigation = useNavigation();
 
-  // Bila editing, data bisa diterima dari route.params.item
-  const item = route?.params?.item;
-
-  // State form
-  const [judul, setJudul] = useState(item?.judul || '');
-  const [deskripsi, setDeskripsi] = useState(item?.deskripsi || '');
-  const [mediaFiles, setMediaFiles] = useState(item?.media ? [item.media] : []);
+  const [judul, setJudul] = useState('');
+  const [deskripsi, setDeskripsi] = useState('');
+  const [mediaFiles, setMediaFiles] = useState([]);
   const [errorJudul, setErrorJudul] = useState('');
 
-  // Dummy fungsi upload (bisa diganti dengan file picker sesungguhnya)
   const uploadMedia = () => {
-    // Simulasi pilih file dan tambahkan ke list mediaFiles
+    // Simulasi upload file
     const dummyFile = {
       name: 'lecture_intro_video.mp4',
       size: '12.4 MB',
@@ -45,11 +41,25 @@ const MateriDetail = ({ route }) => {
     }
     setErrorJudul('');
 
-    // Simpan data ke DB atau kirim ke API
-    Alert.alert('Success', 'Material saved successfully!', [
-      { text: 'OK', onPress: () => navigation.goBack() },
-    ]);
+    const tanggal = new Date().toISOString();
+
+    db.transaction(tx => {
+      tx.executeSql(
+        `INSERT INTO materi (judul, isi, tanggal_dibuat) VALUES (?, ?, ?)`,
+        [judul, deskripsi, tanggal],
+        () => {
+          Alert.alert('Success', 'Material saved successfully!', [
+            { text: 'OK', onPress: () => navigation.goBack() },
+          ]);
+        },
+        error => {
+          console.log('Insert materi error:', error);
+          Alert.alert('Error', 'Failed to save material');
+        },
+      );
+    });
   };
+
 
   return (
     <View style={styles.container}>
@@ -58,9 +68,7 @@ const MateriDetail = ({ route }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <ArrowLeft size={24} color="#4A6CF7" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>
-          {item ? 'Edit Material' : 'Add Material'}
-        </Text>
+        <Text style={styles.headerTitle}>Add Material</Text>
         <View style={{ width: 24 }} />
       </View>
 
@@ -136,7 +144,7 @@ const MateriDetail = ({ route }) => {
   );
 };
 
-export default MateriDetail;
+export default TambahMateri;
 
 const styles = StyleSheet.create({
   container: {

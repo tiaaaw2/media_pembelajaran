@@ -1,63 +1,107 @@
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from 'react-native';
+import db from '../database'; // SESUAIKAN PATH DB KAMU
 
 const Regis = () => {
   const navigation = useNavigation();
+
+  const [nama, setNama] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [konfirmasiPassword, setKonfirmasiPassword] = useState('');
+
+  const handleRegister = () => {
+    if (!nama || !username || !password || !konfirmasiPassword) {
+      Alert.alert('Peringatan', 'Semua field wajib diisi');
+      return;
+    }
+
+    if (password !== konfirmasiPassword) {
+      Alert.alert('Error', 'Password tidak sama');
+      return;
+    }
+
+    db.transaction(tx => {
+      // Cek username sudah ada atau belum
+      tx.executeSql(
+        'SELECT * FROM users WHERE username = ?',
+        [username],
+        (_, result) => {
+          if (result.rows.length > 0) {
+            Alert.alert('Error', 'Username sudah digunakan');
+          } else {
+            // Insert user baru
+            tx.executeSql(
+              `INSERT INTO users (username, password, role, nama, foto)
+               VALUES (?, ?, ?, ?, ?)`,
+              [username, password, 'user', nama, null],
+              () => {
+                Alert.alert('Sukses', 'Registrasi berhasil', [
+                  {
+                    text: 'OK',
+                    onPress: () => navigation.replace('Login'),
+                  },
+                ]);
+              },
+              error => {
+                console.log(error);
+                Alert.alert('Error', 'Registrasi gagal');
+              },
+            );
+          }
+        },
+      );
+    });
+  };
+
   return (
     <View style={styles.container}>
-      {/* Judul */}
       <Text style={styles.title}>Register</Text>
 
-      {/* Input Nama */}
       <TextInput
         placeholder="Nama Lengkap"
-        placeholderTextColor="#999"
+        value={nama}
+        onChangeText={setNama}
         style={styles.input}
       />
 
-      {/* Input Email */}
       <TextInput
-        placeholder="Email"
-        placeholderTextColor="#999"
-        keyboardType="email-address"
+        placeholder="Username"
+        value={username}
+        onChangeText={setUsername}
         style={styles.input}
       />
 
-      {/* Input Password */}
       <TextInput
         placeholder="Password"
-        placeholderTextColor="#999"
         secureTextEntry
+        value={password}
+        onChangeText={setPassword}
         style={styles.input}
       />
 
-      {/* Input Konfirmasi Password */}
       <TextInput
         placeholder="Konfirmasi Password"
-        placeholderTextColor="#999"
         secureTextEntry
+        value={konfirmasiPassword}
+        onChangeText={setKonfirmasiPassword}
         style={styles.input}
       />
 
-      {/* Tombol Register */}
-      <TouchableOpacity
-        onPress={() => navigation.navigate('Login')}
-        style={styles.button}
-      >
+      <TouchableOpacity onPress={handleRegister} style={styles.button}>
         <Text style={styles.buttonText}>Daftar</Text>
       </TouchableOpacity>
 
-      {/* Link Login */}
       <View style={styles.loginContainer}>
-        <Text style={styles.loginText}>sudah punya akun?</Text>
-
+        <Text style={styles.loginText}>Sudah punya akun?</Text>
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Text style={styles.loginLink}> Login</Text>
         </TouchableOpacity>
@@ -67,6 +111,7 @@ const Regis = () => {
 };
 
 export default Regis;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -82,10 +127,9 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   input: {
-    borderRadius: 10,
-    padding: 17,
     backgroundColor: '#F2F4F8',
     borderRadius: 15,
+    padding: 16,
     marginBottom: 16,
   },
   button: {
@@ -106,11 +150,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 25,
   },
-
   loginText: {
     color: '#555',
   },
-
   loginLink: {
     color: '#4A6CF7',
     fontWeight: 'bold',
